@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container">
+    <h1>NDVI camera preview</h1>
+    <img src="{{ url_for('video_feed') }}" type="multipart/x-mixed-replace; boundary=frame" alt="Video Feed" class="img-fluid">
+
+    <form action="{{ url_for('capture') }}" method="POST">
+        <input type="submit" value="Capture Image" class="btn btn-primary mt-3">
+    </form>
+</div>
+{% endblock %}

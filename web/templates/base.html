@@ -1,0 +1,24 @@
+{% extends "bootstrap/base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block navbar %}
+    <nav class="navbar navbar-inverse">
+        <a class="navbar-brand" href="#">Cano & Damas agPrecission<br>NDVI Sensor</a>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <div class="navbar-nav">
+                <a class="nav-item nav-link" href="{{ url_for('index') }}">Inicio</a>
+                <a class="nav-item nav-link" href="{{ url_for('config') }}">Configuración</a>
+                <a class="nav-item nav-link" href="{{ url_for('file_browser') }}">Imágenes</a>
+                <a class="nav-item nav-link" href="{{ url_for('preview') }}">Preview</a>
+            </div>
+        </div>
+    </nav>
+{% endblock %}
+
+{% block content %}
+    <div class="container">
+        {% block main_content %}
+        {% endblock %}
+    </div>
+{% endblock %}

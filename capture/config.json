@@ -1,0 +1,20 @@
+{
+    "width": "4608",
+    "height": "2592",
+    "framerate": "30",
+    "iso": "100",
+    "shutter_speed": "1000",
+    "exposure_mode": "auto",
+    "awb_mode": "off",
+    "awb_gain_red": "1.0",
+    "awb_gain_blue": "2.5",
+    "image_effect": "none",
+    "color_effects": "None",
+    "contrast": "50",
+    "brightness": "50",
+    "sharpness": "0",
+    "saturation": "50",
+    "sensor_mode": "0",
+    "output_path": "/home/antoniofcano/fotos",
+    "max_queue_size": 5
+}

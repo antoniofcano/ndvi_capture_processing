@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+  <h1>Editar configuración</h1>
+  <form method="POST" action="{{ url_for('config') }}">
+    <div class="form-group">
+      <label for="width">Ancho:</label>
+      <input type="number" class="form-control" id="width" name="width" value="{{ config.width }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="height">Altura:</label>
+      <input type="number" class="form-control" id="height" name="height" value="{{ config.height }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="framerate">Framerate:</label>
+      <input type="number" class="form-control" id="framerate" name="framerate" value="{{ config.framerate }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="iso">ISO:</label>
+      <select class="form-control" id="iso" name="iso">
+        {% for iso_value in [100, 200, 320, 400, 800] %}
+          <option value="{{ iso_value }}" {% if config.iso == iso_value %}selected{% endif %}>{{ iso_value }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="shutter_speed">Velocidad de obturación:</label>
+      <input type="number" class="form-control" id="shutter_speed" name="shutter_speed" value="{{ config.shutter_speed }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="exposure_mode">Modo de exposición:</label>
+      <select class="form-control" id="exposure_mode" name="exposure_mode">
+        {% for mode in ['off', 'auto', 'night', 'nightpreview', 'backlight', 'spotlight', 'sports', 'snow', 'beach', 'verylong', 'fixedfps', 'antishake', 'fireworks'] %}
+          <option value="{{ mode }}" {% if config.exposure_mode == mode %}selected{% endif %}>{{ mode }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="awb_mode">Modo de balance de blancos:</label>
+      <select class="form-control" id="awb_mode" name="awb_mode">
+        {% for mode in ['off', 'auto', 'sunlight', 'cloudy', 'shade', 'tungsten', 'fluorescent', 'incandescent', 'flash', 'horizon'] %}
+          <option value="{{ mode }}" {% if config.awb_mode == mode %}selected{% endif %}>{{ mode }}</option>
+        {% endfor %}
+      </select>
+    </div>
+    <div class="form-group">
+      <label for="height">Ganancia canal rojo:</label>
+      <input type="number" class="form-control" id="awb_gain_red" name="awb_gain_red" value="{{ config.awb_gain_red }}" required>
+    </div>
+    <div class="form-group">
+      <label for="height">Ganancia canal azul:</label>
+      <input type="number" class="form-control" id="awb_gain_blue" name="awb_gain_blue" value="{{ config.awb_gain_blue }}" requir>
+    </div>
+
+    <div class="form-group">
+      <label for="image_effect">Efecto de imagen:</label>
+      <select class="form-control" id="image_effect" name="image_effect">
+        {% for effect in ['none', 'negative', 'solarize', 'sketch', 'denoise', 'emboss', 'oilpaint', 'hatch', 'gpen', 'pastel', 'watercolor', 'film', 'blur', 'saturation', 'washedout', 'posterise', 'colorpoint', 'colorbalance', 'cartoon', 'deinterlace1', 'deinterlace2'] %}
+          <option value="{{ effect }}" {% if config.image_effect == effect %}selected{% endif %}>{{ effect }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="color_effects">Efectos de color:</label>
+      <input type="text" class="form-control" id="color_effects" name="color_effects" value="{{ config.color_effects }}" placeholder="Formato: (u, v)">
+    </div>
+
+    <div class="form-group">
+      <label for="contrast">Contraste:</label>
+      <input type="number" class="form-control" id="contrast" name="contrast" value="{{ config.contrast }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="brightness">Brillo:</label>
+      <input type="number" class="form-control" id="brightness" name="brightness" value="{{ config.brightness }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="sharpness">Nitidez:</label>
+      <input type="number" class="form-control" id="sharpness" name="sharpness" value="{{ config.sharpness }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="saturation">Saturación:</label>
+      <input type="number" class="form-control" id="saturation" name="saturation" value="{{ config.saturation }}" required>
+    </div>
+
+    <div class="form-group">
+      <label for="sensor_mode">Modo del sensor:</label>
+      <select class="form-control" id="sensor_mode" name="sensor_mode">
+        {% for mode in range(8) %}
+          <option value="{{ mode }}" {% if config.sensor_mode == mode %}selected{% endif %}>{{ mode }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="form-group">
+      <label for="output_path">Ruta de salida:</label>
+      <input type="text" class="form-control" id="output_path" name="output_path" value="{{ config.output_path }}" required>
+    </div>
+
+    <input type="submit" class="btn btn-primary" value="Guardar">
+  </form>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Imágenes</h1>
+<form method="post" enctype="multipart/form-data" action="{{ url_for('process_ndvi') }}">
+    <div class="form-group">
+        <label for="image_files">Selecciona las imágenes que quieres procesar:</label>
+        <input type="file" class="form-control-file" id="image_files" name="image_files[]" multiple>
+    </div>
+    <input type="hidden" id="selected_images" name="selected_images" value="">
+    <button type="submit" class="btn btn-primary">Procesar NDVI</button>
+</form>
+<hr>
+<div class="row">
+    {% for filename in image_files %}
+    <div class="col-md-3">
+        <a href="#" class="thumbnail" onclick="toggleSelected(this, '{{ filename }}')">
+            <img src="{{ url_for('image', image_path=filename) }}" class="img-thumbnail" alt="{{ filename }}">
+        </a>
+    </div>
+    {% endfor %}
+</div>
+
+<script>
+    function toggleSelected(element, filename) {
+        var selected = element.classList.toggle('selected');
+        var selectedImagesInput = document.getElementById('selected_images');
+        var selectedImages = selectedImagesInput.value.split(',');
+        if (selected) {
+            selectedImages.push(filename);
+        } else {
+            var index = selectedImages.indexOf(filename);
+            if (index !== -1) {
+                selectedImages.splice(index, 1);
+            }
+        }
+        selectedImagesInput.value = selectedImages.join(',');
+    }
+</script>
+{% endblock %}

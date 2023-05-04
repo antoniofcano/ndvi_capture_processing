@@ -1,0 +1,93 @@
+{% extends "base.html" %}
+
+{% block scripts %}
+<script>
+  const form = document.getElementById('image-form');
+  const deleteBtn = document.getElementById('delete-btn');
+  const checkboxes = form.querySelectorAll('input[type="checkbox"]');
+
+  // Habilitar o deshabilitar el botón de eliminar según las casillas de verificación seleccionadas
+  function updateDeleteButton() {
+    const anyChecked = Array.from(checkboxes).some(checkbox => checkbox.checked);
+    deleteBtn.disabled = !anyChecked;
+  }
+
+  // Eliminar imágenes seleccionadas
+  async function deleteImages() {
+    if (confirm('¿Estás seguro de que deseas eliminar las imágenes seleccionadas? Esta acción no se puede deshacer.')) {
+      const selectedImages = Array.from(checkboxes).filter(checkbox => checkbox.checked).map(checkbox => checkbox.value);
+      const response = await fetch("{{ url_for('delete_images') }}", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ images: selectedImages })
+      });
+
+      if (response.ok) {
+        location.reload();
+      } else {
+        alert('Error al eliminar las imágenes seleccionadas');
+      }
+    }
+  }
+
+  // Escuchar cambios en las casillas de verificación
+  checkboxes.forEach(checkbox => {
+    checkbox.addEventListener('change', updateDeleteButton);
+  });
+
+  // Escuchar clic en el botón de eliminar imágenes
+  deleteBtn.addEventListener('click', deleteImages);
+
+  updateDeleteButton();
+</script>
+{% endblock %}
+
+
+{% block content %}
+  <div class="container">
+    <h1>Imágenes capturadas</h1>
+
+    {% if subpath %}
+    <h2>{{ subpath }}</h2>
+    <a href="{{ url_for('file_browser', subpath=get_parent_dir(subpath)) }}">Regresar a la carpeta anterior</a>
+    {% endif %}
+
+    <div class="row">
+      {% for folder in folders %}
+        <div class="col-md-3 mb-4">
+          <div class="card">
+            <img src="{{ url_for('static', filename='folder_icon.png') }}" class="card-img-top" alt="Carpeta">
+            <div class="card-body">
+              <a href="{{ url_for('file_browser', subpath=folder) }}" class="stretched-link">{{ folder }}</a>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+
+      <form id="image-form">      
+        {% for file in files %}
+          <div class="col-md-3 mb-4">
+            <div class="card">
+              <img src="{{ url_for('serve_file', path=file) }}" class="card-img-top" alt="Imagen" style="max-height: 200px; object-fit: contain;">
+              <div class="card-body">
+                <a href="{{ url_for('serve_file', path=file) }}" target="_blank" class="stretched-link">{{ file }}</a>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="checkbox" value="{{ file }}" name="selected_images">
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </form>
+    </div>
+    <hr>
+    {% if subpath %}
+      <a href="{{ url_for('download', subpath=subpath) }}" class="btn btn-primary">Descargar todas las imágenes</a>
+    {% else %}
+      <a href="{{ url_for('download') }}" class="btn btn-primary">Descargar todas las imágenes</a>
+    {% endif %}
+    <button type="button" id="delete-btn" class="btn btn-danger" disabled>Eliminar imágenes</button>
+  </div>
+{% endblock %}

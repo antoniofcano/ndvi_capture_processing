@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block content %}
+    <h1>Imágenes</h1>
+    <a href="{{ url_for('download') }}" class="btn btn-primary">Descargar todas las imágenes</a>
+    <hr>
+    <div class="row">
+        {% for filename in image_files %}
+            <div class="col-md-3">
+                <a href="{{ url_for('image', image_path=filename) }}">
+                    <img src="{{ url_for('image', image_path=filename) }}" class="img-thumbnail" alt="{{ filename }}">
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
