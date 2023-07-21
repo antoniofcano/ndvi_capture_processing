@@ -121,10 +121,6 @@ def capture_image(camera, capture_config, output_path):
         main_image = buffers[0]
 
         # Espera si la cola está llena
-        image_queue.put((main_image, metadata, ".jpg"))
-        image_queue.put((raw_image, metadata, ".dng"))
-
-        # Espera si la cola está llena
         sequence_counter += 1
         filename = os.path.join(output_path, 'image_%04d' % sequence_counter)
         image_queue.put((main_image, metadata, ".jpg", filename))
