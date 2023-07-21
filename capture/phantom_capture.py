@@ -25,14 +25,14 @@ def sigterm_handler(signal, frame):
     sys.exit(0)
 
 
-def get_next_sequence_number(output_path):
+def get_last_sequence_number(output_path):
     max_sequence_num = 0
     for filename in os.listdir(output_path):
         if filename.startswith('image_'):
             sequence_num = int(filename[6:-4])
             if sequence_num > max_sequence_num:
                 max_sequence_num = sequence_num
-    return max_sequence_num + 1
+    return max_sequence_num
 
 def read_config(file_path):
     try:
@@ -68,14 +68,14 @@ def setup_camera(config):
         logging.exception(f"Error al configurar la cámara: {e}")
         sys.exit(1)
 
-def save_image(image_queue, output_path, capture_config):
+def save_image(image_queue, capture_config):
+
     try:
         while True:
-            image_buffer, metadata, ext = image_queue.get()
+            image_buffer, metadata, ext, filename = image_queue.get()
             if image_buffer is None:
                 break
 
-            filename = os.path.join(output_path, 'image_%04d' % get_next_sequence_number(output_path)) + ext
             if ext == ".jpg":
                 camera.helpers.save(camera.helpers.make_image(image_buffer, capture_config["main"]), metadata, filename)
             elif ext == ".dng":
@@ -86,17 +86,7 @@ def save_image(image_queue, output_path, capture_config):
     except Exception as e:
         logging.exception(f"Error al guardar la imagen: {e}")
         image_queue.task_done()
-
-#def capture_image(camera, capture_config, output_path):
-#    filename = os.path.join(output_path, 'image_%04d' % get_next_sequence_number(output_path))
-    #camera.start_and_capture_file(filename)
-
-#    buffers, metadata = camera.switch_mode_and_capture_buffers(capture_config, ["main", "raw"])
-#    raw_image = buffers[1]
-
-#    camera.helpers.save(camera.helpers.make_image(buffers[0], capture_config["main"]), metadata, filename + ".jpg")
-#    camera.helpers.save_dng(raw_image, metadata, capture_config["raw"], filename + ".dng")
-
+        
 def capture_image(camera, capture_config, output_path):
     try:
         buffers, metadata = camera.switch_mode_and_capture_buffers(capture_config, ["main", "raw"])
@@ -106,6 +96,13 @@ def capture_image(camera, capture_config, output_path):
         # Espera si la cola está llena
         image_queue.put((main_image, metadata, ".jpg"))
         image_queue.put((raw_image, metadata, ".dng"))
+
+        # Espera si la cola está llena
+        sequence_counter += 1
+        filename = os.path.join(output_path, 'image_%04d' % sequence_counter)
+        image_queue.put((main_image, metadata, ".jpg", filename))
+        image_queue.put((raw_image, metadata, ".dng", filename))
+
     except Exception as e:
         logging.exception(f"Error al capturar la imagen: {e}")
 
@@ -123,6 +120,9 @@ log_file = config.get('log_file', 'app.log')
 # Configura el nivel de log a INFO, de modo que se registrarán todos los mensajes de nivel INFO y superior
 # También configura el formato del mensaje de log y especifica que los mensajes de log deben guardarse en un archivo llamado 'app.log'
 logging.basicConfig(filename=log_file, level=getattr(logging, log_level.upper()), format='%(asctime)s - %(levelname)s - %(message)s')
+
+# Inicializa el contador de secuencia al arrancar el script
+sequence_counter = get_last_sequence_number(output_path)
 
 # Crea un manejador de log para la salida estándar y añádelo al logger raíz
 console_handler = logging.StreamHandler()
@@ -167,7 +167,7 @@ executor = ThreadPoolExecutor(max_workers=1)
 image_queue = queue.Queue(maxsize=max_queue_size)
 
 # Inicia un hilo para guardar imágenes desde la cola
-executor.submit(save_image, image_queue, output_path, capture_config)
+executor.submit(save_image, image_queue, capture_config)
 
 LED_OFF = 0
 LED_ON = 1
