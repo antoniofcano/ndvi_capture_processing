@@ -28,7 +28,7 @@ def handle_signal(signal, frame):
         signal.SIGHUP: "Se recibió SIGHUP. Terminal cerrado, finalizando."
     }
     # Obtén el motivo del cierre basado en la señal recibida
-    reason = reason_map.get(signal_number, f"Señal desconocida recibida ({signal_number}). Limpiando y terminando el programa.")
+    reason = reason_map.get(signal, f"Señal desconocida recibida ({signal}). Limpiando y terminando el programa.")
     logging.info(reason)
 
     # Cerrar la cámara
