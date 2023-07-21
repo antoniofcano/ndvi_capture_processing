@@ -130,6 +130,7 @@ config = read_config('config.json')
 # Inicializa las variables desde la configuración
 threshold_on = config.get('threshold_on', 3500)
 threshold_off = config.get('threshold_off', 15)
+max_pool_threads = config.get('max_pool_threads', 1)
 max_queue_size = config.get('max_queue_size', 5)
 sensor_read_delay = config.get('sensor_read_delay', 0.1)
 log_level = config.get('log_level', 'INFO')
@@ -179,13 +180,14 @@ except Exception as e:
 
 #Inicializa el entorno MultiThread
 # Crea un ThreadPoolExecutor con 1 hilo
-executor = ThreadPoolExecutor(max_workers=1)
+executor = ThreadPoolExecutor(max_workers=max_pool_threads)
 
 # Crea una cola con un límite máximo de elementos
 image_queue = queue.Queue(maxsize=max_queue_size)
 
-# Inicia un hilo para guardar imágenes desde la cola
-executor.submit(save_image, image_queue, capture_config)
+# Inicia max_pool_threads hilos para guardar imágenes desde la cola
+for _ in range(max_pool_threads):
+    executor.submit(save_image, image_queue, capture_config)
 
 LED_OFF = 0
 LED_ON = 1

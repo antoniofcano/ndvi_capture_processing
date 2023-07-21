@@ -16,6 +16,7 @@
     "saturation": "50",
     "sensor_mode": "0",
     "output_path": "/home/antoniofcano/fotos",
+    "max_pool_threads": 2,
     "max_queue_size": 5,
     "threshold_on": 3500,
     "threshold_off": 15,
