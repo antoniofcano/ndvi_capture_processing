@@ -38,8 +38,11 @@ def handle_signal(signum, frame):
     i2c.deinit()
 
     # Detén el proceso de guardado cuando se interrumpa la captura
-    image_queue.put((None, None, None))
-    image_queue.join()
+    try:
+        image_queue.put((None, None, None))
+        image_queue.join()
+    Exception:
+        logging.info(f"image_queue not defined: {e}")
 
     # Finalizar todos los hilos
     executor.shutdown(wait=True)
