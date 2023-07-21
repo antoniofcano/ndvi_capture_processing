@@ -19,11 +19,29 @@ from concurrent.futures import ThreadPoolExecutor
 
 import logging
 
-def sigterm_handler(signal, frame):
+def handle_signal(signal, frame):
     # Realiza las tareas de limpieza necesarias aquí, si las hay
-    logging.info("Terminando el servicio...")
-    sys.exit(0)
+    # Mapa de señales a mensajes de motivo
+    reason_map = {
+        signal.SIGTERM: "Se recibió SIGTERM. Limpiando y terminando el programa.",
+        signal.SIGINT: "Se recibió SIGINT. Interrupción por el usuario, finalizando.",
+        signal.SIGHUP: "Se recibió SIGHUP. Terminal cerrado, finalizando."
+    }
+    # Obtén el motivo del cierre basado en la señal recibida
+    reason = reason_map.get(signal_number, f"Señal desconocida recibida ({signal_number}). Limpiando y terminando el programa.")
+    logging.info(reason)
 
+    # Cerrar la cámara
+    camera.close()
+
+    # Detén el proceso de guardado cuando se interrumpa la captura
+    image_queue.put((None, None, None))
+    image_queue.join()
+
+    # Finalizar todos los hilos
+    executor.shutdown(wait=True)
+
+    sys.exit(0)
 
 def get_last_sequence_number(output_path):
     max_sequence_num = 0
@@ -133,7 +151,7 @@ logging.getLogger().addHandler(console_handler)
 
 
 # Registra el controlador de la señal SIGTERM
-signal.signal(signal.SIGTERM, sigterm_handler)
+signal.signal(signal.SIGTERM, handle_signal)
 
 try:
     # Configura la conexión I2C
@@ -196,12 +214,8 @@ try:
         # Espera antes de leer el siguiente valor
         time.sleep(sensor_read_delay)
 except KeyboardInterrupt:
-        # Detén el proceso de guardado cuando se interrumpa la captura
-        image_queue.put((None, None, None))
-        image_queue.join()
-        executor.shutdown(wait=True)
+    logging.info("Interrupción por el usuario, finalizando...")
 except Exception as e:
-    logging.exception(f"Error durante la captura de imágenes: {e}")
-    image_queue.put((None, None, None))
-    image_queue.join()
-    executor.shutdown(wait=True)
+    logging.exception(f"Error inesperado durante la captura de imágenes: {e}")
+finally:
+    sys.exit(0)
