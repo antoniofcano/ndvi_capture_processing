@@ -45,7 +45,10 @@ def handle_signal(signum, frame):
         logging.info(f"image_queue not defined: {e}")
 
     # Finalizar todos los hilos
-    executor.shutdown(wait=True)
+    try:
+        executor.shutdown(wait=True)
+    except Exception as e:
+        logging.info(f"executor not defined: {e}")
 
     sys.exit(0)
 
