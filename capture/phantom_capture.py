@@ -34,6 +34,9 @@ def handle_signal(signal, frame):
     # Cerrar la cámara
     camera.close()
 
+    #Libera el bus i2c
+    i2c.deinit()
+
     # Detén el proceso de guardado cuando se interrumpa la captura
     image_queue.put((None, None, None))
     image_queue.join()
