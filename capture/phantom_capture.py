@@ -41,7 +41,7 @@ def handle_signal(signum, frame):
     try:
         image_queue.put((None, None, None))
         image_queue.join()
-    Exception:
+    except Exception as e:
         logging.info(f"image_queue not defined: {e}")
 
     # Finalizar todos los hilos
