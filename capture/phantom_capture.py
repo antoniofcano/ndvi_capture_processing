@@ -155,8 +155,9 @@ console_handler.setFormatter(formatter)
 logging.getLogger().addHandler(console_handler)
 
 
-# Registra el controlador de la señal SIGTERM
+# Registra el controlador de la señal SIGTERM (kill) y SIGINT (Ctrl-C)
 signal.signal(signal.SIGTERM, handle_signal)
+signal.signal(signal.SIGINT, handle_signal)
 
 try:
     # Configura la conexión I2C
