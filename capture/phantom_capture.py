@@ -19,7 +19,7 @@ from concurrent.futures import ThreadPoolExecutor
 
 import logging
 
-def handle_signal(signal, frame):
+def handle_signal(signum, frame):
     # Realiza las tareas de limpieza necesarias aquí, si las hay
     # Mapa de señales a mensajes de motivo
     reason_map = {
@@ -28,7 +28,7 @@ def handle_signal(signal, frame):
         signal.SIGHUP: "Se recibió SIGHUP. Terminal cerrado, finalizando."
     }
     # Obtén el motivo del cierre basado en la señal recibida
-    reason = reason_map.get(signal, f"Señal desconocida recibida ({signal}). Limpiando y terminando el programa.")
+    reason = reason_map.get(signum, f"Señal desconocida recibida ({signum}). Limpiando y terminando el programa.")
     logging.info(reason)
 
     # Cerrar la cámara
