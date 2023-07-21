@@ -138,6 +138,7 @@ max_queue_size = config.get('max_queue_size', 5)
 sensor_read_delay = config.get('sensor_read_delay', 0.1)
 log_level = config.get('log_level', 'INFO')
 log_file = config.get('log_file', 'app.log')
+output_path = config['output_path']
 
 # Configura el nivel de log a INFO, de modo que se registrarán todos los mensajes de nivel INFO y superior
 # También configura el formato del mensaje de log y especifica que los mensajes de log deben guardarse en un archivo llamado 'app.log'
@@ -172,7 +173,6 @@ except Exception as e:
 contador = 0
 camera = setup_camera(config)
 capture_config = camera.create_still_configuration(raw={})
-output_path = config['output_path']
 
 try:
     camera.start()
