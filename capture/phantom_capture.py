@@ -143,10 +143,6 @@ except Exception as e:
 threshold_on = 3500
 threshold_off = 15
 
-# Estado del LED
-led_on = True
-led_off = False
-
 #Inicializa la Camara
 contador = 0
 camera = setup_camera(config)
@@ -171,21 +167,24 @@ image_queue = queue.Queue(maxsize=max_queue_size)
 # Inicia un hilo para guardar imágenes desde la cola
 executor.submit(save_image, image_queue, output_path, capture_config)
 
+LED_OFF = 0
+LED_ON = 1
+
+# Estado inicial del LED
+led_state = LED_OFF
 try:
     while True:
         # Lee el valor de lux del sensor
         lux = sensor.lux
 
-        # Verifica si el LED está apagado (lux < threshold_off) y si estaba previamente encendido
-        if lux < threshold_off and led_on:
-            led_off = True
-            led_on = False
+        # Comprueba si el LED se ha apagado (lux < threshold_off) y estaba previamente encendido
+        if lux < threshold_off and led_state == LED_ON:
+            led_state = LED_OFF
 
-        # Si se cumplió la secuencia apagado-encendido
-        # Verifica si el LED está encendido (lux > threshold_on) y si estaba previamente apagado
-        elif lux > threshold_on and led_off:
-            led_on = True
-            led_off = False
+        # Si la secuencia de apagado-encendido se ha completado
+        # Comprueba si el LED se ha encendido (lux > threshold_on) y estaba previamente apagado
+        elif lux > threshold_on and led_state == LED_OFF:
+            led_state = LED_ON
             contador = contador + 1
             logging.debug(f"{contador} Secuencia encendido-apagado-encendido detectada!")
 
