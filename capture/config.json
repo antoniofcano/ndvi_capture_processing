@@ -16,5 +16,11 @@
     "saturation": "50",
     "sensor_mode": "0",
     "output_path": "/home/antoniofcano/fotos",
-    "max_queue_size": 5
+    "max_queue_size": 5,
+    "threshold_on": 3500,
+    "threshold_off": 15,
+    "max_queue_size": 5,
+    "sensor_read_delay": 0.1,
+    "log_level": "DEBUG",
+    "log_file": "/home/antoniofcano/app.log"
 }

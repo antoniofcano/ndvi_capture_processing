@@ -110,9 +110,19 @@ def capture_image(camera, capture_config, output_path):
         logging.exception(f"Error al capturar la imagen: {e}")
 
 
+# Lee la configuración desde un archivo JSON
+config = read_config('config.json')
+# Inicializa las variables desde la configuración
+threshold_on = config.get('threshold_on', 3500)
+threshold_off = config.get('threshold_off', 15)
+max_queue_size = config.get('max_queue_size', 5)
+sensor_read_delay = config.get('sensor_read_delay', 0.1)
+log_level = config.get('log_level', 'INFO')
+log_file = config.get('log_file', 'app.log')
+
 # Configura el nivel de log a INFO, de modo que se registrarán todos los mensajes de nivel INFO y superior
 # También configura el formato del mensaje de log y especifica que los mensajes de log deben guardarse en un archivo llamado 'app.log'
-logging.basicConfig(filename='app.log', level=logging.DEBUG, format='%(asctime)s - %(levelname)s - %(message)s')
+logging.basicConfig(filename=log_file, level=getattr(logging, log_level.upper()), format='%(asctime)s - %(levelname)s - %(message)s')
 
 # Crea un manejador de log para la salida estándar y añádelo al logger raíz
 console_handler = logging.StreamHandler()
@@ -125,9 +135,6 @@ logging.getLogger().addHandler(console_handler)
 # Registra el controlador de la señal SIGTERM
 signal.signal(signal.SIGTERM, sigterm_handler)
 
-# Lee la configuración desde un archivo JSON
-config = read_config('config.json')
-
 try:
     # Configura la conexión I2C
     i2c = busio.I2C(board.SCL, board.SDA)
@@ -138,10 +145,6 @@ try:
 except Exception as e:
     logging.exception(f"Error al inicializar el sensor de luz: {e}")
     sys.exit(1)
-
-# Umbral para determinar si el LED está encendido o apagado
-threshold_on = 3500
-threshold_off = 15
 
 #Inicializa la Camara
 contador = 0
@@ -161,7 +164,6 @@ except Exception as e:
 executor = ThreadPoolExecutor(max_workers=1)
 
 # Crea una cola con un límite máximo de elementos
-max_queue_size = 5
 image_queue = queue.Queue(maxsize=max_queue_size)
 
 # Inicia un hilo para guardar imágenes desde la cola
@@ -191,8 +193,8 @@ try:
             # Captura la imagen
             capture_image(camera, capture_config, output_path)
 
-        # Espera 100 ms antes de leer el siguiente valor
-        time.sleep(0.1)
+        # Espera antes de leer el siguiente valor
+        time.sleep(sensor_read_delay)
 except KeyboardInterrupt:
         # Detén el proceso de guardado cuando se interrumpa la captura
         image_queue.put((None, None, None))
